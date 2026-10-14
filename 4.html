@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome! 16 Interactive Vocabulary & Audio Sync</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Fredoka (English Kids) & Tajawal (Arabic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --font-en: 'Fredoka', cursive, sans-serif;
+      --font-ar: 'Tajawal', sans-serif;
+    }
+
+    body {
+      font-family: var(--font-ar);
+      background-color: #f1f5f9;
+      background-image: 
+        radial-gradient(#cbd5e1 1.2px, transparent 1.2px), 
+        radial-gradient(#fed7aa 1.2px, #f1f5f9 1.2px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      min-height: 100vh;
+      color: #1e293b;
+      user-select: none;
+    }
+
+    .font-english {
+      font-family: var(--font-en);
+    }
+
+    /* Dashed Poster Card Matching Original Poster */
+    .poster-card {
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      background-color: #ffffff;
+      border-style: dashed;
+      border-width: 3.5px;
+    }
+    .poster-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 16px 30px -8px rgba(0, 0, 0, 0.12);
+    }
+    .poster-card:active {
+      transform: scale(0.98);
+    }
+
+    /* 16 Border Colors matching the original artwork */
+    .card-border-1  { border-color: #38bdf8; } /* July */
+    .card-border-2  { border-color: #4ade80; } /* June */
+    .card-border-3  { border-color: #f59e0b; } /* Late */
+    .card-border-4  { border-color: #a855f7; } /* March */
+    .card-border-5  { border-color: #f43f5e; } /* May */
+    .card-border-6  { border-color: #84cc16; } /* Month */
+    .card-border-7  { border-color: #ea580c; } /* November */
+    .card-border-8  { border-color: #d97706; } /* September */
+    .card-border-9  { border-color: #eab308; } /* Time */
+    .card-border-10 { border-color: #0284c7; } /* Year */
+    .card-border-11 { border-color: #ec4899; } /* April */
+    .card-border-12 { border-color: #10b981; } /* August */
+    .card-border-13 { border-color: #8b5cf6; } /* Calendar */
+    .card-border-14 { border-color: #f97316; } /* Date */
+    .card-border-15 { border-color: #06b6d4; } /* December */
+    .card-border-16 { border-color: #fb7185; } /* February */
+
+    /* Sound-to-Image Karaoke Glow Effect */
+    .sync-card-active {
+      transform: translateY(-6px) scale(1.03) !important;
+      background: linear-gradient(165deg, #ffffff 0%, #fffef0 100%) !important;
+      border-color: #f59e0b !important;
+      border-style: solid !important;
+      box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.4), 0 20px 35px -5px rgba(245, 158, 11, 0.35) !important;
+      animation: pulseSyncHalo 1.2s ease-in-out infinite alternate;
+    }
+
+    .sync-img-active {
+      transform: scale(1.15) translateY(-4px) !important;
+      filter: drop-shadow(0 12px 20px rgba(245, 158, 11, 0.6)) !important;
+      animation: floatIllustration 0.9s ease-in-out infinite alternate;
+    }
+
+    .sync-word-active {
+      color: #d97706 !important;
+      transform: scale(1.1);
+      text-shadow: 0 0 12px rgba(251, 191, 36, 0.8);
+      display: inline-block;
+      transition: all 0.2s ease;
+    }
+
+    .sync-ar-active {
+      color: #b45309 !important;
+      transform: scale(1.15);
+      font-weight: 900;
+      display: inline-block;
+      transition: all 0.2s ease;
+    }
+
+    @keyframes pulseSyncHalo {
+      0% { box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.35), 0 12px 25px -4px rgba(245, 158, 11, 0.25); }
+      100% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.65), 0 22px 40px -4px rgba(245, 158, 11, 0.45); }
+    }
+
+    @keyframes floatIllustration {
+      0% { transform: scale(1.12) translateY(0); }
+      100% { transform: scale(1.18) translateY(-6px); }
+    }
+
+    /* Live Equalizer Animation */
+    .eq-wave-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      height: 18px;
+    }
+    .eq-bar {
+      width: 3.5px;
+      border-radius: 9999px;
+      animation: eqBounce 0.7s ease-in-out infinite;
+    }
+    .eq-bar:nth-child(1) { height: 6px; background-color: #38bdf8; animation-delay: 0.1s; }
+    .eq-bar:nth-child(2) { height: 16px; background-color: #f59e0b; animation-delay: 0.3s; }
+    .eq-bar:nth-child(3) { height: 10px; background-color: #ec4899; animation-delay: 0.2s; }
+    .eq-bar:nth-child(4) { height: 14px; background-color: #10b981; animation-delay: 0.4s; }
+
+    @keyframes eqBounce {
+      0%, 100% { height: 5px; }
+      50% { height: 18px; }
+    }
+
+    /* Print Styles */
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      #tabContent-poster { box-shadow: none !important; border: none !important; margin: 0 !important; max-width: 100% !important; }
+    }
+  </style>
+</head>
+
+<body class="p-3 sm:p-6 lg:p-8 antialiased flex flex-col items-center">
+
+  <!-- TOP TOOLBAR & CONTROLS -->
+  <header class="no-print w-full max-w-5xl bg-white/95 backdrop-blur-md rounded-2xl p-4 mb-6 shadow-md border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+    
+    <!-- Accent & Status -->
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-2xl shrink-0 shadow-inner">
+        🎙️
+      </div>
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-black bg-rose-100 text-rose-800 px-3 py-1 rounded-full border border-rose-200 flex items-center gap-1">
+            <span>🇬🇧</span> نطق إنجليزي بريطاني فقط (English Only)
+          </span>
+          <span class="text-xs font-bold bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            تزامن صوتي-بصري لـ 16 بطاقة
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 font-semibold mt-1">اضغط على أي بطاقة لسماع النطق الإنجليزي حصراً بدون قراءة بالعربية</p>
+      </div>
+    </div>
+
+    <!-- Action Toolbar -->
+    <div class="flex items-center flex-wrap gap-2">
+      <!-- Autoplay 1-16 -->
+      <button onclick="playAllCardsSequentially()" id="playAllBtn" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white rounded-xl text-xs font-black shadow-sm transition flex items-center gap-1.5 active:scale-95">
+        <span>▶️</span>
+        <span>تشغيل الكل (1-16)</span>
+      </button>
+
+      <!-- Voice Speed Toggle -->
+      <button onclick="toggleVoiceSpeed()" id="speedBtn" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95">
+        <span>⚡</span>
+        <span id="speedLabel">السرعة: عادية</span>
+      </button>
+
+      <!-- English Only Badge Indicator -->
+      <div class="px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-extrabold flex items-center gap-1">
+        <span>🇬🇧</span>
+        <span>إنجليزية فقط</span>
+      </div>
+
+      <!-- Print Button -->
+      <button onclick="window.print()" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition" title="طباعة الملصق">
+        🖨️
+      </button>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="no-print w-full max-w-5xl flex items-center gap-2 mb-6 overflow-x-auto pb-1">
+    <button onclick="switchTab('poster')" id="tabBtn-poster" class="px-5 py-2.5 rounded-2xl font-black text-sm transition-all shadow-sm flex items-center gap-2 bg-indigo-600 text-white">
+      <span>🖼️</span>
+      <span>البوستر التفاعلي (16 مفردة)</span>
+    </button>
+    <button onclick="switchTab('quiz')" id="tabBtn-quiz" class="px-5 py-2.5 rounded-2xl font-black text-sm transition-all shadow-sm flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100">
+      <span>🎧</span>
+      <span>تحدي الاستماع بالصوت</span>
+    </button>
+    <button onclick="switchTab('spelling')" id="tabBtn-spelling" class="px-5 py-2.5 rounded-2xl font-black text-sm transition-all shadow-sm flex items-center gap-2 bg-white text-slate-700 hover:bg-slate-100">
+      <span>✍️</span>
+      <span>الحرف الناقص</span>
+    </button>
+  </nav>
+
+  <!-- TAB 1: MAIN POSTER CANVAS (4x4 Grid = 16 Cards) -->
+  <main id="tabContent-poster" class="w-full max-w-5xl bg-white rounded-[36px] shadow-2xl p-5 sm:p-8 border-4 border-white/90 relative overflow-hidden">
+    
+    <!-- Header: Mascot Star, Bubbly "Welcome!", and Smart Pencil Mascot -->
+    <div class="flex items-center justify-between pb-6 mb-2 relative">
+      
+      <!-- Cheerful Star Mascot -->
+      <div class="w-16 h-16 sm:w-24 sm:h-24 shrink-0 transition-transform hover:scale-110 cursor-pointer" onclick="sfx.playCheer(); fireConfetti(0.4)" title="Happy Star!">
+        <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-md">
+          <polygon points="60,10 75,44 112,47 84,72 92,108 60,88 28,108 36,72 8,47 45,44" fill="#fed049" stroke="#f59e0b" stroke-width="4" stroke-linejoin="round"/>
+          <ellipse cx="48" cy="54" rx="4.5" ry="5.5" fill="#1e293b"/>
+          <circle cx="46.5" cy="52" r="1.8" fill="#ffffff"/>
+          <ellipse cx="72" cy="54" rx="4.5" ry="5.5" fill="#1e293b"/>
+          <circle cx="70.5" cy="52" r="1.8" fill="#ffffff"/>
+          <path d="M52 66 Q60 74 68 66" stroke="#b45309" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+          <ellipse cx="40" cy="62" rx="4.5" ry="3.5" fill="#f87171" opacity="0.6"/>
+          <ellipse cx="80" cy="62" rx="4.5" ry="3.5" fill="#f87171" opacity="0.6"/>
+          <path d="M102 24 L105 18 L108 24 L114 27 L108 30 L105 36 L102 30 L96 27 Z" fill="#f59e0b"/>
+          <path d="M18 84 L20 79 L22 84 L27 86 L22 88 L20 93 L18 88 L13 86 Z" fill="#f59e0b"/>
+        </svg>
+      </div>
+
+      <!-- Center Title: 3D Bubbly "Welcome!" -->
+      <div class="text-center flex-1 px-2 select-none" dir="ltr">
+        <h1 class="font-english text-5xl sm:text-7xl font-extrabold tracking-tight flex items-center justify-center gap-0.5" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));">
+          <span class="text-[#3b82f6] hover:scale-110 transition-transform inline-block">W</span>
+          <span class="text-[#ea580c] hover:scale-110 transition-transform inline-block">e</span>
+          <span class="text-[#f59e0b] hover:scale-110 transition-transform inline-block">l</span>
+          <span class="text-[#10b981] hover:scale-110 transition-transform inline-block">c</span>
+          <span class="text-[#8b5cf6] hover:scale-110 transition-transform inline-block">o</span>
+          <span class="text-[#ec4899] hover:scale-110 transition-transform inline-block">m</span>
+          <span class="text-[#06b6d4] hover:scale-110 transition-transform inline-block">e</span>
+          <span class="text-[#f59e0b] hover:scale-110 transition-transform inline-block">!</span>
+        </h1>
+        <!-- Pencil Scribble Underline -->
+        <div class="w-48 sm:w-72 mx-auto mt-1">
+          <svg viewBox="0 0 260 18" class="w-full">
+            <path d="M4 10 Q65 16 130 9 T256 12" fill="none" stroke="#64748b" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 1"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Cartoon Pencil Mascot -->
+      <div class="w-16 h-16 sm:w-24 sm:h-24 shrink-0 transition-transform hover:scale-110 cursor-pointer" onclick="sfx.playCheer(); fireConfetti(0.4)" title="Smart Pencil!">
+        <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-md">
+          <g transform="translate(60,60) rotate(24) translate(-60,-60)">
+            <rect x="42" y="10" width="36" height="18" rx="6" fill="#f43f5e" stroke="#be123c" stroke-width="3"/>
+            <rect x="42" y="28" width="36" height="10" fill="#94a3b8" stroke="#64748b" stroke-width="2.5"/>
+            <rect x="42" y="38" width="36" height="52" rx="3" fill="#38bdf8" stroke="#0284c7" stroke-width="3"/>
+            <line x1="54" y1="38" x2="54" y2="90" stroke="#0284c7" stroke-width="2"/>
+            <line x1="66" y1="38" x2="66" y2="90" stroke="#0284c7" stroke-width="2"/>
+            <polygon points="42,90 78,90 60,114" fill="#fde047" stroke="#ca8a04" stroke-width="2.5"/>
+            <polygon points="54,106 66,106 60,114" fill="#1e293b"/>
+            <circle cx="51" cy="58" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="2.8"/>
+            <circle cx="51" cy="58" r="3.2" fill="#1e293b"/>
+            <circle cx="53" cy="56" r="1.2" fill="#ffffff"/>
+            <circle cx="69" cy="58" r="7.5" fill="#ffffff" stroke="#1e293b" stroke-width="2.8"/>
+            <circle cx="69" cy="58" r="3.2" fill="#1e293b"/>
+            <circle cx="71" cy="56" r="1.2" fill="#ffffff"/>
+            <line x1="58.5" y1="58" x2="61.5" y2="58" stroke="#1e293b" stroke-width="2.5"/>
+            <path d="M55 72 Q60 76 65 72" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          </g>
+        </svg>
+      </div>
+
+    </div>
+
+    <!-- 4x4 GRID CONTAINER (16 CARDS) -->
+    <div id="posterCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 mb-4" dir="ltr">
+      <!-- 16 Vocabulary Cards Injected Here via JavaScript with Full Vector SVGs -->
+    </div>
+
+  </main>
+
+  <!-- TAB 2: LISTENING QUIZ GAME -->
+  <section id="tabContent-quiz" class="hidden w-full max-w-5xl bg-white rounded-[36px] shadow-2xl p-6 sm:p-9 border-4 border-white/90">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+      <div>
+        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+          <span>🎧</span> تحدي الاستماع وتطابق الصورة (16 مفردة)
+        </h2>
+        <p class="text-xs text-slate-500 font-bold mt-1">استمع جيداً للنطق البريطاني ثم اضغط على الصورة والكلمة الصحيحة</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="px-3.5 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl font-black text-sm">
+          النقاط: <span id="quizScore">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Question Card -->
+    <div class="bg-indigo-50/60 rounded-3xl p-6 border-2 border-indigo-100 flex flex-col items-center justify-center text-center mb-6">
+      <button onclick="playQuizPromptAudio()" class="w-20 h-20 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center text-3xl shadow-lg hover:scale-105 active:scale-95 transition">
+        🔊
+      </button>
+      <span class="text-xs font-black text-indigo-700 mt-3 bg-white px-4 py-1 rounded-full shadow-sm">
+        انقر لإعادة سماع الصوت البريطاني
+      </span>
+      <p id="quizPromptHint" class="text-slate-500 text-xs mt-2 font-bold">أيّ من الصور التالية تطابق الكلمة المنطوقة؟</p>
+    </div>
+
+    <!-- 4 Option Cards -->
+    <div id="quizOptionsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <!-- Injected via JavaScript -->
+    </div>
+  </section>
+
+  <!-- TAB 3: MISSING LETTERS SPELLING -->
+  <section id="tabContent-spelling" class="hidden w-full max-w-5xl bg-white rounded-[36px] shadow-2xl p-6 sm:p-9 border-4 border-white/90 text-center">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6 text-right">
+      <div>
+        <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+          <span>✍️</span> تمرين الحرف الناقص (Spelling Quest)
+        </h2>
+        <p class="text-xs text-slate-500 font-bold mt-1">انظر إلى الصورة واكتشف الحرف الإنجليزي الناقص لإكمال الكلمة</p>
+      </div>
+      <div class="text-xs font-black bg-amber-100 text-amber-900 px-3 py-1.5 rounded-xl">
+        المستوى: <span id="spellingStep">1</span> / 16
+      </div>
+    </div>
+
+    <!-- Active Spelling Display -->
+    <div class="max-w-md mx-auto bg-slate-50 rounded-3xl p-6 border-2 border-slate-200/80 mb-6 flex flex-col items-center">
+      <div id="spellingImgWrap" class="w-36 h-36 mb-4 flex items-center justify-center">
+        <!-- Rendered in JS -->
+      </div>
+      <div id="spellingWordDisplay" class="font-english text-4xl sm:text-5xl font-black tracking-widest text-slate-800 mb-2">
+        <!-- Rendered in JS -->
+      </div>
+      <span id="spellingArMeaning" class="text-lg font-black text-slate-500">
+        <!-- Rendered in JS -->
+      </span>
+    </div>
+
+    <!-- Letter Choice Buttons -->
+    <div id="spellingKeyChoices" class="flex flex-wrap items-center justify-center gap-3 max-w-lg mx-auto">
+      <!-- Rendered in JS -->
+    </div>
+  </section>
+
+  <!-- FLOATING TOAST -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 transform translate-y-28 opacity-0 transition-all duration-300 z-50 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-white/20 pointer-events-none" dir="ltr">
+    <span id="toastIcon" class="text-2xl">✨</span>
+    <div>
+      <div id="toastTitle" class="font-english font-extrabold text-sm text-amber-300">Welcome!</div>
+      <div id="toastMsg" class="font-semibold text-xs text-slate-200">Tap cards to hear pronunciation.</div>
+    </div>
+  </div>
+
+  <script>
+    /* 16 Vocabulary Items Dictionary Matching image_6d4fd6.jpg Exactly */
+    const VOCAB_DATA = [
+      /* Row 1 */
+      { id: 1, word: "July", ar: "يوليو", missing: "J_ly", letter: "u", color: "#38bdf8", borderClass: "card-border-1" },
+      { id: 2, word: "June", ar: "يونيو", missing: "J_ne", letter: "u", color: "#4ade80", borderClass: "card-border-2" },
+      { id: 3, word: "Late", ar: "متأخر", missing: "L_te", letter: "a", color: "#f59e0b", borderClass: "card-border-3" },
+      { id: 4, word: "March", ar: "مارس", missing: "M_rch", letter: "a", color: "#a855f7", borderClass: "card-border-4" },
+      
+      /* Row 2 */
+      { id: 5, word: "May", ar: "مايو", missing: "M_y", letter: "a", color: "#f43f5e", borderClass: "card-border-5" },
+      { id: 6, word: "Month", ar: "شهر", missing: "M_nth", letter: "o", color: "#84cc16", borderClass: "card-border-6" },
+      { id: 7, word: "November", ar: "نوفمبر", missing: "Nov_mber", letter: "e", color: "#ea580c", borderClass: "card-border-7" },
+      { id: 8, word: "September", ar: "سبتمبر", missing: "Sept_mber", letter: "e", color: "#d97706", borderClass: "card-border-8" },
+
+      /* Row 3 */
+      { id: 9, word: "Time", ar: "وقت", missing: "T_me", letter: "i", color: "#eab308", borderClass: "card-border-9" },
+      { id: 10, word: "Year", ar: "سنة", missing: "Y_ar", letter: "e", color: "#0284c7", borderClass: "card-border-10" },
+      { id: 11, word: "April", ar: "أبريل", missing: "Ap_il", letter: "r", color: "#ec4899", borderClass: "card-border-11" },
+      { id: 12, word: "August", ar: "أغسطس", missing: "Aug_st", letter: "u", color: "#10b981", borderClass: "card-border-12" },
+
+      /* Row 4 */
+      { id: 13, word: "Calendar", ar: "تقويم", missing: "Cal_ndar", letter: "e", color: "#8b5cf6", borderClass: "card-border-13" },
+      { id: 14, word: "Date", ar: "تاريخ", missing: "D_te", letter: "a", color: "#f97316", borderClass: "card-border-14" },
+      { id: 15, word: "December", ar: "ديسمبر", missing: "Dec_mber", letter: "e", color: "#06b6d4", borderClass: "card-border-15" },
+      { id: 16, word: "February", ar: "فبراير", missing: "Feb_uary", letter: "r", color: "#fb7185", borderClass: "card-border-16" }
+    ];
+
+    /* Detailed SVGs tailored to image_6d4fd6.jpg */
+    const SVG_ASSETS = {
+      // 1. July: Sun in sunglasses, beach, deck chair, palm tree, drink
+      1: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <path d="M10 115 Q80 105 150 115 L150 145 L10 145 Z" fill="#38bdf8"/>
+            <path d="M40 125 Q95 118 150 125 L150 145 L40 145 Z" fill="#fde047"/>
+            <!-- Palm Tree -->
+            <path d="M130 130 Q135 90 126 65" stroke="#92400e" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path d="M126 65 Q102 58 98 72" stroke="#15803d" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+            <path d="M126 65 Q138 50 152 62" stroke="#15803d" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+            <path d="M126 65 Q118 46 108 50" stroke="#22c55e" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+            <path d="M126 65 Q136 44 148 48" stroke="#22c55e" stroke-width="3.8" stroke-linecap="round" fill="none"/>
+            <!-- Sun with Sunglasses -->
+            <circle cx="50" cy="50" r="24" fill="#fbbf24" stroke="#f59e0b" stroke-width="2.5"/>
+            <g stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round">
+              <line x1="50" y1="20" x2="50" y2="12"/><line x1="50" y1="80" x2="50" y2="88"/>
+              <line x1="20" y1="50" x2="12" y2="50"/><line x1="80" y1="50" x2="88" y2="50"/>
+              <line x1="28" y1="28" x2="22" y2="22"/><line x1="72" y1="72" x2="78" y2="78"/>
+              <line x1="28" y1="72" x2="22" y2="78"/><line x1="72" y1="28" x2="78" y2="22"/>
+            </g>
+            <path d="M35 45 L65 45 L62 55 Q50 58 38 55 Z" fill="#0f172a"/>
+            <line x1="48" y1="46" x2="52" y2="46" stroke="#0f172a" stroke-width="2"/>
+            <path d="M44 62 Q50 67 56 62" stroke="#b45309" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <!-- Beach Lounge Chair -->
+            <line x1="55" y1="130" x2="85" y2="105" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="70" y1="117" x2="95" y2="130" stroke="#ea580c" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="60" y1="126" x2="88" y2="103" stroke="#fed7aa" stroke-width="2" stroke-dasharray="2 3"/>
+            <!-- Coconut drink -->
+            <circle cx="102" cy="128" r="7" fill="#78350f"/>
+            <line x1="102" y1="124" x2="106" y2="114" stroke="#f43f5e" stroke-width="2"/>
+          </svg>`,
+
+      // 2. June: Cool Pineapple with Sunglasses & Drink in Float Ring
+      2: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Pool water ripples -->
+            <ellipse cx="80" cy="135" rx="55" ry="12" fill="#bae6fd"/>
+            <!-- Yellow Floating Ring -->
+            <ellipse cx="80" cy="122" rx="42" ry="16" fill="#facc15" stroke="#eab308" stroke-width="3"/>
+            <ellipse cx="80" cy="122" rx="24" ry="9" fill="#38bdf8"/>
+            <!-- Pineapple Body -->
+            <ellipse cx="80" cy="94" rx="26" ry="32" fill="#fbbf24" stroke="#d97706" stroke-width="2.5"/>
+            <!-- Diamond pattern lines -->
+            <path d="M62 84 L98 106 M62 106 L98 84 M68 76 L92 114 M92 76 L68 114" stroke="#d97706" stroke-width="1.4" opacity="0.6"/>
+            <!-- Green Leaves Crown -->
+            <path d="M80 64 Q65 42 60 52 Q74 58 78 64" fill="#22c55e" stroke="#15803d" stroke-width="1.8"/>
+            <path d="M80 64 Q80 34 83 48 Q82 58 80 64" fill="#16a34a" stroke="#15803d" stroke-width="1.8"/>
+            <path d="M80 64 Q95 42 100 52 Q86 58 82 64" fill="#22c55e" stroke="#15803d" stroke-width="1.8"/>
+            <!-- Sunglasses -->
+            <path d="M66 88 L94 88 L91 97 Q80 100 69 97 Z" fill="#0f172a"/>
+            <line x1="78" y1="89" x2="82" y2="89" stroke="#0f172a" stroke-width="2"/>
+            <!-- Smile -->
+            <path d="M74 104 Q80 109 86 104" stroke="#b45309" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <!-- Tropical Drink in hand -->
+            <rect x="100" y="96" width="12" height="16" rx="2" fill="#38bdf8" stroke="#0284c7" stroke-width="1.5"/>
+            <line x1="108" y1="96" x2="114" y2="86" stroke="#f43f5e" stroke-width="2" stroke-linecap="round"/>
+          </svg>`,
+
+      // 3. Late: White Rabbit Running with Briefcase & Pocket Watch
+      3: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Speed dust trails -->
+            <path d="M30 125 Q45 125 55 120" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="2 3" fill="none"/>
+            <!-- Rabbit Body & Legs -->
+            <ellipse cx="85" cy="98" rx="20" ry="24" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2.5"/>
+            <path d="M80 118 L68 136 M90 118 L104 135" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+            <!-- Blue vest -->
+            <path d="M72 96 C72 88, 98 88, 98 96 L96 112 L74 112 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2"/>
+            <!-- Rabbit Head -->
+            <circle cx="85" cy="74" r="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+            <!-- Rabbit Ears (swept back) -->
+            <path d="M78 60 C65 42, 60 25, 72 26 C80 32, 82 48, 80 60" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+            <path d="M76 54 C68 40, 66 32, 72 32 C76 36, 78 46, 76 54" fill="#fda4af"/>
+            <path d="M88 60 C80 44, 82 26, 92 28 C98 34, 94 48, 90 60" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+            <!-- Face -->
+            <circle cx="80" cy="72" r="2.8" fill="#1e293b"/>
+            <circle cx="92" cy="72" r="2.8" fill="#1e293b"/>
+            <ellipse cx="86" cy="76" rx="2" ry="1.5" fill="#f43f5e"/>
+            <path d="M86 78 Q82 82 86 84 Q90 82 86 78" stroke="#cbd5e1" stroke-width="1.2" fill="none"/>
+            <!-- Running Arms -->
+            <line x1="72" y1="96" x2="52" y2="108" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+            <line x1="96" y1="96" x2="114" y2="104" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
+            <!-- Brown Briefcase -->
+            <rect x="42" y="104" width="22" height="18" rx="3" fill="#854d0e" stroke="#582900" stroke-width="1.8"/>
+            <line x1="53" y1="104" x2="53" y2="122" stroke="#582900" stroke-width="1.5"/>
+            <!-- Pocket Watch -->
+            <circle cx="120" cy="106" r="12" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+            <circle cx="120" cy="106" r="9" fill="#ffffff"/>
+            <line x1="120" y1="106" x2="120" y2="100" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="120" y1="106" x2="125" y2="106" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="120" cy="93" r="2" fill="#ca8a04"/>
+          </svg>`,
+
+      // 4. March: Spring Rainbow, Meadow Flowers & Bluebird
+      4: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Green meadow -->
+            <path d="M15 125 Q80 115 145 125 L145 145 L15 145 Z" fill="#86efac"/>
+            <!-- Rainbow Arches -->
+            <g fill="none" stroke-width="5" stroke-linecap="round">
+              <path d="M35 120 A45 45 0 0 1 125 120" stroke="#f43f5e"/>
+              <path d="M40 120 A40 40 0 0 1 120 120" stroke="#fb923c"/>
+              <path d="M45 120 A35 35 0 0 1 115 120" stroke="#facc15"/>
+              <path d="M50 120 A30 30 0 0 1 110 120" stroke="#4ade80"/>
+              <path d="M55 120 A25 25 0 0 1 105 120" stroke="#38bdf8"/>
+              <path d="M60 120 A20 20 0 0 1 100 120" stroke="#a855f7"/>
+            </g>
+            <!-- Meadow flowers -->
+            <circle cx="35" cy="125" r="4" fill="#f43f5e"/>
+            <circle cx="55" cy="128" r="3.5" fill="#eab308"/>
+            <circle cx="95" cy="126" r="4" fill="#ec4899"/>
+            <circle cx="125" cy="127" r="3.5" fill="#f43f5e"/>
+            <!-- Cute Bluebird -->
+            <ellipse cx="120" cy="55" rx="12" ry="9" fill="#38bdf8"/>
+            <circle cx="128" cy="50" r="7" fill="#0284c7"/>
+            <circle cx="130" cy="48" r="1.5" fill="#ffffff"/>
+            <polygon points="135,50 142,52 135,54" fill="#f97316"/>
+            <path d="M112 55 Q118 64 124 55" fill="#0369a1"/>
+          </svg>`,
+
+      // 5. May: Spring Garden Flowers (Tulips) with Happy Bumblebee
+      5: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Grassy hill -->
+            <path d="M10 135 Q80 122 150 135 L150 148 L10 148 Z" fill="#bbf7d0"/>
+            <!-- Stems -->
+            <line x1="38" y1="130" x2="38" y2="88" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+            <line x1="68" y1="130" x2="68" y2="76" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+            <line x1="102" y1="130" x2="102" y2="84" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+            <line x1="132" y1="130" x2="132" y2="92" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+            <!-- Leaves -->
+            <path d="M38 108 Q24 102 32 96 Q38 104 38 108" fill="#22c55e"/>
+            <path d="M68 98 Q80 92 76 84 Q68 92 68 98" fill="#22c55e"/>
+            <path d="M102 104 Q114 98 108 92 Q102 100 102 104" fill="#22c55e"/>
+            <!-- Flowers -->
+            <!-- Pink Tulip -->
+            <path d="M68 76 C55 76 55 58 68 54 C81 58 81 76 68 76" fill="#f43f5e"/>
+            <path d="M68 76 C62 65 65 56 68 54 C71 56 74 65 68 76" fill="#fb7185"/>
+            <!-- Rose Flower -->
+            <circle cx="38" cy="85" r="10" fill="#ec4899"/>
+            <circle cx="38" cy="85" r="4" fill="#fde047"/>
+            <!-- Orange Tulip -->
+            <circle cx="102" cy="82" r="9" fill="#f97316"/>
+            <circle cx="102" cy="82" r="3.5" fill="#fde047"/>
+            <!-- Pink Flower -->
+            <circle cx="132" cy="90" r="8" fill="#fb7185"/>
+            <!-- Bumblebee Flying -->
+            <ellipse cx="118" cy="54" rx="10" ry="7" fill="#facc15" stroke="#0f172a" stroke-width="1.8"/>
+            <line x1="114" y1="48" x2="114" y2="60" stroke="#0f172a" stroke-width="2"/>
+            <line x1="120" y1="48" x2="120" y2="60" stroke="#0f172a" stroke-width="2"/>
+            <!-- Bee Wings -->
+            <ellipse cx="114" cy="42" rx="4" ry="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.2"/>
+            <ellipse cx="120" cy="42" rx="4" ry="7" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1.2"/>
+          </svg>`,
+
+      // 6. Month: Smiling Desk Calendar with red top & dates
+      6: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <polygon points="26,134 134,134 124,56 36,56" fill="#0284c7"/>
+            <polygon points="32,130 128,130 120,62 40,62" fill="#38bdf8"/>
+            <rect x="38" y="50" width="84" height="78" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.5"/>
+            <rect x="38" y="50" width="84" height="22" rx="4" fill="#ef4444"/>
+            <!-- Ring binders -->
+            <circle cx="48" cy="50" r="3" fill="#64748b"/>
+            <circle cx="64" cy="50" r="3" fill="#64748b"/>
+            <circle cx="80" cy="50" r="3" fill="#64748b"/>
+            <circle cx="96" cy="50" r="3" fill="#64748b"/>
+            <circle cx="112" cy="50" r="3" fill="#64748b"/>
+            <!-- Cute Face on Calendar -->
+            <circle cx="70" cy="62" r="2.5" fill="#ffffff"/>
+            <circle cx="90" cy="62" r="2.5" fill="#ffffff"/>
+            <path d="M77 65 Q80 68 83 65" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <!-- Calendar grid boxes -->
+            <g fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1">
+              <rect x="46" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="64" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="82" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="100" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="46" y="96" width="14" height="11" rx="1.5"/>
+              <rect x="64" y="96" width="14" height="11" rx="1.5"/>
+              <rect x="82" y="96" width="14" height="11" rx="1.5" fill="#fee2e2" stroke="#fca5a5"/>
+              <rect x="100" y="96" width="14" height="11" rx="1.5"/>
+              <rect x="46" y="112" width="14" height="11" rx="1.5"/>
+              <rect x="64" y="112" width="14" height="11" rx="1.5"/>
+              <rect x="82" y="112" width="14" height="11" rx="1.5"/>
+              <rect x="100" y="112" width="14" height="11" rx="1.5"/>
+            </g>
+            <path d="M89 98 A2 2 0 0 0 86 100 A2 2 0 0 0 89 104 Q89 104 89 104 Q89 104 92 100 A2 2 0 0 0 89 98 Z" fill="#ef4444"/>
+          </svg>`,
+
+      // 7. November: Autumn Tree with Orange Leaves & Pumpkin
+      7: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Autumn ground with scattered leaves -->
+            <path d="M15 132 Q80 124 145 132 L145 145 L15 145 Z" fill="#fed7aa"/>
+            <!-- Tree Trunk -->
+            <path d="M72 132 L74 95 Q68 85 64 78 M74 95 Q82 86 88 80 L80 132" stroke="#78350f" stroke-width="7" stroke-linecap="round" fill="none"/>
+            <!-- Foliage Clouds -->
+            <g fill="#ea580c" stroke="#c2410c" stroke-width="2">
+              <circle cx="58" cy="68" r="22"/>
+              <circle cx="78" cy="50" r="26" fill="#f97316"/>
+              <circle cx="100" cy="68" r="22"/>
+              <circle cx="78" cy="74" r="20" fill="#f59e0b"/>
+            </g>
+            <!-- Falling leaves -->
+            <ellipse cx="120" cy="80" rx="3.5" ry="6" fill="#ea580c" transform="rotate(35 120 80)"/>
+            <ellipse cx="128" cy="98" rx="3.5" ry="6" fill="#f59e0b" transform="rotate(-25 128 98)"/>
+            <ellipse cx="40" cy="88" rx="3.5" ry="6" fill="#c2410c" transform="rotate(40 40 88)"/>
+            <!-- Pumpkin on the ground -->
+            <ellipse cx="118" cy="126" rx="16" ry="11" fill="#ea580c" stroke="#9a3412" stroke-width="2"/>
+            <ellipse cx="118" cy="126" rx="9" ry="11" fill="#f97316" stroke="#9a3412" stroke-width="1.5"/>
+            <!-- Pumpkin stem -->
+            <path d="M118 116 Q118 110 122 110" stroke="#15803d" stroke-width="3" stroke-linecap="round" fill="none"/>
+          </svg>`,
+
+      // 8. September: Back to School Boy with Backpack and Book
+      8: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Autumn path -->
+            <path d="M15 132 Q80 126 145 132 L145 145 L15 145 Z" fill="#fed7aa"/>
+            <!-- Legs walking -->
+            <line x1="72" y1="112" x2="64" y2="135" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>
+            <line x1="84" y1="112" x2="94" y2="135" stroke="#1e293b" stroke-width="5" stroke-linecap="round"/>
+            <!-- Backpack on back -->
+            <rect x="92" y="78" width="16" height="26" rx="5" fill="#0284c7" stroke="#0369a1" stroke-width="2"/>
+            <!-- Torso & Blue/Yellow Shirt -->
+            <rect x="68" y="76" width="26" height="36" rx="5" fill="#f59e0b" stroke="#d97706" stroke-width="2"/>
+            <!-- Head with Glasses & Brown Hair -->
+            <circle cx="80" cy="56" r="16" fill="#fed7aa"/>
+            <path d="M64 52 C64 36, 96 36, 96 52 C92 45, 84 45, 80 48 C76 45, 68 45, 64 52 Z" fill="#78350f"/>
+            <!-- Glasses -->
+            <circle cx="74" cy="56" r="5" fill="none" stroke="#1e293b" stroke-width="1.8"/>
+            <circle cx="86" cy="56" r="5" fill="none" stroke="#1e293b" stroke-width="1.8"/>
+            <line x1="79" y1="56" x2="81" y2="56" stroke="#1e293b" stroke-width="1.8"/>
+            <circle cx="74" cy="56" r="2" fill="#1e293b"/>
+            <circle cx="86" cy="56" r="2" fill="#1e293b"/>
+            <path d="M78 64 Q80 67 82 64" stroke="#b45309" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <!-- Book in hand -->
+            <rect x="54" y="86" width="16" height="20" rx="2" fill="#ec4899" stroke="#be123c" stroke-width="1.8"/>
+            <line x1="62" y1="86" x2="62" y2="106" stroke="#ffffff" stroke-width="1.5"/>
+          </svg>`,
+
+      // 9. Time: Cute Smiling Alarm Clock with Bells & Feet
+      9: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Feet -->
+            <line x1="50" y1="120" x2="38" y2="136" stroke="#0284c7" stroke-width="6" stroke-linecap="round"/>
+            <line x1="110" y1="120" x2="122" y2="136" stroke="#0284c7" stroke-width="6" stroke-linecap="round"/>
+            <!-- Bells on top -->
+            <circle cx="54" cy="52" r="15" fill="#f59e0b" stroke="#b45309" stroke-width="3"/>
+            <circle cx="106" cy="52" r="15" fill="#f59e0b" stroke="#b45309" stroke-width="3"/>
+            <rect x="76" y="44" width="8" height="12" rx="2" fill="#94a3b8"/>
+            <!-- Clock Body -->
+            <circle cx="80" cy="90" r="44" fill="#38bdf8" stroke="#0284c7" stroke-width="4.5"/>
+            <circle cx="80" cy="90" r="35" fill="#ffffff"/>
+            <!-- Face -->
+            <circle cx="68" cy="85" r="4" fill="#0f172a"/>
+            <circle cx="66.5" cy="83.5" r="1.5" fill="#ffffff"/>
+            <circle cx="92" cy="85" r="4" fill="#0f172a"/>
+            <circle cx="90.5" cy="83.5" r="1.5" fill="#ffffff"/>
+            <path d="M74 96 Q80 102 86 96" stroke="#b45309" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <ellipse cx="60" cy="92" rx="3.5" ry="2.5" fill="#fca5a5" opacity="0.6"/>
+            <ellipse cx="100" cy="92" rx="3.5" ry="2.5" fill="#fca5a5" opacity="0.6"/>
+            <!-- Hands showing 10:10 -->
+            <line x1="80" y1="90" x2="70" y2="72" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+            <line x1="80" y1="90" x2="98" y2="90" stroke="#1e293b" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>`,
+
+      // 10. Year: Smiling Planet Earth holding 365 Calendar
+      10: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Earth Globe -->
+            <circle cx="74" cy="84" r="38" fill="#38bdf8" stroke="#0284c7" stroke-width="3.5"/>
+            <!-- Continents -->
+            <path d="M52 64 Q64 60 68 72 Q64 84 50 80 Z" fill="#4ade80"/>
+            <path d="M84 62 Q102 65 96 82 Q88 88 80 78 Z" fill="#4ade80"/>
+            <path d="M58 96 Q70 108 78 102 Q74 94 62 90 Z" fill="#4ade80"/>
+            <!-- Cute Face on Earth -->
+            <circle cx="66" cy="80" r="3.2" fill="#0f172a"/>
+            <circle cx="82" cy="80" r="3.2" fill="#0f172a"/>
+            <path d="M70 88 Q74 93 78 88" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            <ellipse cx="58" cy="86" rx="3" ry="2" fill="#fda4af"/>
+            <ellipse cx="90" cy="86" rx="3" ry="2" fill="#fda4af"/>
+            <!-- Arms waving -->
+            <path d="M42 84 Q30 76 26 66" stroke="#0284c7" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M106 84 Q116 80 120 92" stroke="#0284c7" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <!-- Calendar 365 in Hand -->
+            <g transform="translate(110, 88)">
+              <rect x="0" y="0" width="28" height="30" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.8"/>
+              <rect x="0" y="0" width="28" height="9" rx="2" fill="#ef4444"/>
+              <text x="14" y="23" font-size="10" font-weight="900" fill="#1e293b" text-anchor="middle" font-family="sans-serif">365</text>
+            </g>
+          </svg>`,
+
+      // 11. April: Pink Umbrella in Spring Rain with Blooming Flowers
+      11: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Grass ground -->
+            <rect x="20" y="130" width="120" height="12" rx="6" fill="#bbf7d0"/>
+            <!-- Flowers blooming -->
+            <circle cx="36" cy="118" r="4.5" fill="#f43f5e"/><line x1="36" y1="122" x2="36" y2="134" stroke="#16a34a" stroke-width="2"/>
+            <circle cx="60" cy="115" r="5" fill="#ec4899"/><line x1="60" y1="120" x2="60" y2="134" stroke="#16a34a" stroke-width="2"/>
+            <circle cx="112" cy="117" r="4.5" fill="#fb7185"/><line x1="112" y1="121" x2="112" y2="134" stroke="#16a34a" stroke-width="2"/>
+            <circle cx="132" cy="118" r="4" fill="#facc15"/><line x1="132" y1="122" x2="132" y2="134" stroke="#16a34a" stroke-width="2"/>
+            <!-- Pink Umbrella -->
+            <path d="M72 72 A32 32 0 0 1 136 72 Z" fill="#f43f5e" stroke="#e11d48" stroke-width="2.5"/>
+            <line x1="104" y1="72" x2="104" y2="116" stroke="#be123c" stroke-width="3.5" stroke-linecap="round"/>
+            <path d="M104 116 Q104 124 96 124" stroke="#be123c" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+            <!-- Rain Clouds -->
+            <g fill="#ffffff" stroke="#bae6fd" stroke-width="2.5">
+              <circle cx="48" cy="54" r="16"/>
+              <circle cx="68" cy="44" r="22"/>
+              <circle cx="90" cy="54" r="16"/>
+              <rect x="46" y="53" width="46" height="18" stroke="none"/>
+            </g>
+            <!-- Smiling cloud face -->
+            <circle cx="60" cy="53" r="2.8" fill="#1e293b"/>
+            <circle cx="76" cy="53" r="2.8" fill="#1e293b"/>
+            <path d="M65 60 Q68 64 71 60" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <!-- Rain drops -->
+            <path d="M48 80 Q50 74 52 80 Q52 84 48 84 Z" fill="#38bdf8"/>
+            <path d="M68 78 Q70 72 72 78 Q72 82 68 82 Z" fill="#38bdf8"/>
+            <path d="M58 92 Q60 86 62 92 Q62 96 58 96 Z" fill="#38bdf8"/>
+          </svg>`,
+
+      // 12. August: Smiling Sun relaxing in Beach Lounger Chair
+      12: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Beach sand & blue waves -->
+            <path d="M10 120 Q80 110 150 120 L150 145 L10 145 Z" fill="#38bdf8"/>
+            <path d="M40 128 Q95 120 150 128 L150 145 L40 145 Z" fill="#fde047"/>
+            <!-- Sun reclining in lounge chair with glasses -->
+            <g stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round">
+              <line x1="85" y1="40" x2="85" y2="30"/>
+              <line x1="120" y1="52" x2="128" y2="46"/>
+              <line x1="50" y1="52" x2="42" y2="46"/>
+            </g>
+            <circle cx="85" cy="72" r="26" fill="#fbbf24" stroke="#f59e0b" stroke-width="2.5"/>
+            <!-- Cool sunglasses -->
+            <path d="M72 66 L98 66 L95 76 Q85 80 75 76 Z" fill="#0f172a"/>
+            <line x1="82" y1="67" x2="88" y2="67" stroke="#0f172a" stroke-width="2"/>
+            <path d="M78 84 Q85 89 92 84" stroke="#b45309" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            <!-- Wooden Deck Chair Structure -->
+            <line x1="60" y1="130" x2="98" y2="92" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round"/>
+            <line x1="80" y1="110" x2="114" y2="130" stroke="#ea580c" stroke-width="4.5" stroke-linecap="round"/>
+            <!-- Striped beach fabric -->
+            <line x1="66" y1="126" x2="102" y2="90" stroke="#f43f5e" stroke-width="2.5" stroke-dasharray="3 3"/>
+            <!-- Cold drink with straw -->
+            <rect x="122" y="112" width="12" height="18" rx="2" fill="#f97316"/>
+            <line x1="128" y1="112" x2="132" y2="100" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+          </svg>`,
+
+      // 13. Calendar: Desktop Spiral Standing Calendar with Smile
+      13: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <polygon points="26,134 134,134 124,56 36,56" fill="#0284c7"/>
+            <polygon points="32,130 128,130 120,62 40,62" fill="#38bdf8"/>
+            <rect x="38" y="50" width="84" height="78" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.5"/>
+            <rect x="38" y="50" width="84" height="22" rx="4" fill="#ef4444"/>
+            <!-- Spiral coils -->
+            <ellipse cx="48" cy="50" rx="2.5" ry="5" fill="#475569"/>
+            <ellipse cx="64" cy="50" rx="2.5" ry="5" fill="#475569"/>
+            <ellipse cx="80" cy="50" rx="2.5" ry="5" fill="#475569"/>
+            <ellipse cx="96" cy="50" rx="2.5" ry="5" fill="#475569"/>
+            <ellipse cx="112" cy="50" rx="2.5" ry="5" fill="#475569"/>
+            <!-- Face -->
+            <circle cx="70" cy="62" r="2.5" fill="#ffffff"/>
+            <circle cx="90" cy="62" r="2.5" fill="#ffffff"/>
+            <path d="M77 65 Q80 68 83 65" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <!-- Grid dots -->
+            <g fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1">
+              <rect x="46" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="64" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="82" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="100" y="80" width="14" height="11" rx="1.5"/>
+              <rect x="46" y="96" width="14" height="11" rx="1.5"/>
+              <rect x="64" y="96" width="14" height="11" rx="1.5"/>
+              <rect x="82" y="96" width="14" height="11" rx="1.5" fill="#fee2e2" stroke="#fca5a5"/>
+              <rect x="100" y="96" width="14" height="11" rx="1.5"/>
+            </g>
+          </svg>`,
+
+      // 14. Date: Wall Calendar Sheet with Big '25' and cute heart
+      14: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- White card paper -->
+            <rect x="42" y="44" width="76" height="88" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+            <!-- Red top border -->
+            <rect x="42" y="44" width="76" height="20" rx="4" fill="#ef4444"/>
+            <!-- Spiral loops on top -->
+            <ellipse cx="52" cy="44" rx="2.8" ry="6" fill="#78350f"/>
+            <ellipse cx="68" cy="44" rx="2.8" ry="6" fill="#78350f"/>
+            <ellipse cx="84" cy="44" rx="2.8" ry="6" fill="#78350f"/>
+            <ellipse cx="100" cy="44" rx="2.8" ry="6" fill="#78350f"/>
+            <!-- Bold '25' Number -->
+            <text x="80" y="105" font-size="38" font-weight="900" fill="#1e293b" text-anchor="middle" font-family="'Fredoka', sans-serif">25</text>
+            <!-- Cute Little Heart -->
+            <path d="M106 116 A2.5 2.5 0 0 0 102 119 A2.5 2.5 0 0 0 106 124 Q106 124 106 124 Q106 124 110 119 A2.5 2.5 0 0 0 106 116 Z" fill="#ef4444"/>
+          </svg>`,
+
+      // 15. December: Smiling Snowman with Red Scarf and Winter Hat
+      15: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Snow ground -->
+            <ellipse cx="80" cy="138" rx="55" ry="12" fill="#e0f2fe" stroke="#bae6fd" stroke-width="2"/>
+            <!-- Bottom & Top Snowballs -->
+            <circle cx="80" cy="114" r="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.2"/>
+            <circle cx="80" cy="74" r="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2.2"/>
+            <!-- Stick arms -->
+            <line x1="60" y1="92" x2="35" y2="80" stroke="#78350f" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="100" y1="92" x2="125" y2="80" stroke="#78350f" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Eyes & Carrot nose -->
+            <circle cx="73" cy="70" r="2.8" fill="#1e293b"/>
+            <circle cx="87" cy="70" r="2.8" fill="#1e293b"/>
+            <polygon points="80,74 80,78 92,76" fill="#f97316"/>
+            <path d="M75 82 Q80 86 85 82" stroke="#1e293b" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+            <!-- Red winter beanie hat -->
+            <path d="M64 60 C64 42, 96 42, 96 60 Z" fill="#ef4444" stroke="#b91c1c" stroke-width="2"/>
+            <circle cx="80" cy="42" r="5" fill="#ffffff"/>
+            <!-- Red & White Scarf -->
+            <rect x="66" y="86" width="28" height="8" rx="3.5" fill="#ef4444"/>
+            <path d="M85 94 L89 112 L97 112 L93 94 Z" fill="#dc2626"/>
+            <!-- Snowflake -->
+            <text x="24" y="50" font-size="14" fill="#7dd3fc">❄</text>
+            <text x="122" y="52" font-size="13" fill="#7dd3fc">❄</text>
+          </svg>`,
+
+      // 16. February: Cute Valentine Heart Character with Warm Blue Scarf
+      16: `<svg viewBox="0 0 160 160" class="w-full h-full drop-shadow">
+            <!-- Floating Little Hearts -->
+            <path d="M36 50 A4 4 0 0 0 30 55 A4 4 0 0 0 36 61 Q36 62 36 62 Q36 62 42 55 A4 4 0 0 0 36 50 Z" fill="#f43f5e" opacity="0.6"/>
+            <path d="M124 45 A4 4 0 0 0 118 50 A4 4 0 0 0 124 56 Q124 57 124 57 Q124 57 130 50 A4 4 0 0 0 124 45 Z" fill="#f43f5e" opacity="0.6"/>
+            <path d="M126 96 A4 4 0 0 0 120 101 A4 4 0 0 0 126 107 Q126 108 126 108 Q126 108 132 101 A4 4 0 0 0 126 96 Z" fill="#f43f5e" opacity="0.6"/>
+            <!-- Big Cute Heart Character -->
+            <path d="M80 50 C62 30, 32 40, 32 72 C32 100, 80 126, 80 126 C80 126, 128 100, 128 72 C128 40, 98 30, 80 50 Z" fill="#fb7185" stroke="#f43f5e" stroke-width="2.8"/>
+            <circle cx="66" cy="68" r="3.5" fill="#1e293b"/>
+            <circle cx="64.5" cy="66" r="1.3" fill="#ffffff"/>
+            <circle cx="94" cy="68" r="3.5" fill="#1e293b"/>
+            <circle cx="92.5" cy="66" r="1.3" fill="#ffffff"/>
+            <path d="M75 76 Q80 82 85 76" stroke="#881337" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <ellipse cx="58" cy="74" rx="4" ry="2.5" fill="#fda4af"/>
+            <ellipse cx="102" cy="74" rx="4" ry="2.5" fill="#fda4af"/>
+            <!-- Blue Winter Scarf with Fringe -->
+            <path d="M48 98 Q80 90 112 98 L108 108 Q80 100 52 108 Z" fill="#38bdf8" stroke="#0284c7" stroke-width="2.2"/>
+            <path d="M56 104 L52 126 L64 126 L66 104 Z" fill="#0ea5e9" stroke="#0284c7" stroke-width="2"/>
+            <line x1="53" y1="112" x2="65" y2="112" stroke="#ffffff" stroke-width="1.8"/>
+            <line x1="53" y1="120" x2="63" y2="120" stroke="#ffffff" stroke-width="1.8"/>
+          </svg>`
+    };
+
+    class SoundFX {
+      constructor() { this.ctx = null; }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      beep(freq, type = 'sine', duration = 0.12, gainVal = 0.15) {
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      }
+      playPop() { this.beep(520, 'sine', 0.08, 0.12); }
+      playSuccess() {
+        this.beep(523.25, 'triangle', 0.1, 0.2);
+        setTimeout(() => this.beep(659.25, 'triangle', 0.12, 0.2), 90);
+        setTimeout(() => this.beep(783.99, 'triangle', 0.18, 0.25), 180);
+      }
+      playWrong() {
+        this.beep(280, 'sawtooth', 0.14, 0.15);
+        setTimeout(() => this.beep(210, 'sawtooth', 0.18, 0.15), 110);
+      }
+      playCheer() {
+        this.beep(440, 'triangle', 0.1, 0.15);
+        setTimeout(() => this.beep(554.37, 'triangle', 0.1, 0.18), 80);
+        setTimeout(() => this.beep(659.25, 'triangle', 0.25, 0.2), 160);
+      }
+    }
+    const sfx = new SoundFX();
+
+    const speechEngine = {
+      voices: [],
+      rate: 0.92,
+      init() {
+        if ('speechSynthesis' in window) {
+          const load = () => { this.voices = window.speechSynthesis.getVoices(); };
+          load();
+          if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = load;
+          }
+        }
+      },
+      getBritishFemaleVoice() {
+        if (!this.voices || this.voices.length === 0) {
+          this.voices = window.speechSynthesis.getVoices();
+        }
+        const ukVoices = this.voices.filter(v =>
+          v.lang === 'en-GB' || v.lang === 'en_GB' || v.lang.toLowerCase().startsWith('en-gb')
+        );
+        const femaleNames = ['female', 'hazel', 'serena', 'susan', 'libby', 'fiona', 'kate', 'victoria', 'martha', 'alice', 'amy', 'clara'];
+        const ukFemale = ukVoices.find(v => femaleNames.some(fn => v.name.toLowerCase().includes(fn)));
+        if (ukFemale) return ukFemale;
+        const googleUk = ukVoices.find(v => v.name.includes('Google UK English Female'));
+        if (googleUk) return googleUk;
+        if (ukVoices.length > 0) return ukVoices[0];
+        return this.voices.find(v => v.lang.startsWith('en')) || null;
+      },
+      speakCard(item, onFinish) {
+        if (!('speechSynthesis' in window)) {
+          if (onFinish) onFinish();
+          return;
+        }
+        window.speechSynthesis.cancel();
+
+        // Strictly speak in English only (No Arabic audio utterance)
+        const engUtter = new SpeechSynthesisUtterance(item.word);
+        engUtter.lang = 'en-GB';
+        engUtter.rate = this.rate;
+        engUtter.pitch = 1.08;
+        const ukVoice = this.getBritishFemaleVoice();
+        if (ukVoice) engUtter.voice = ukVoice;
+
+        // Visual Active Elements on Poster
+        const cardEl = document.getElementById(`posterCard-${item.id}`);
+        const imgEl = document.getElementById(`imgContainer-${item.id}`);
+        const wordEl = document.getElementById(`wordText-${item.id}`);
+        const eqEl = document.getElementById(`eqWave-${item.id}`);
+
+        engUtter.onstart = () => {
+          if (cardEl) cardEl.classList.add('sync-card-active');
+          if (imgEl) imgEl.classList.add('sync-img-active');
+          if (wordEl) wordEl.classList.add('sync-word-active');
+          if (eqEl) eqEl.classList.remove('opacity-0');
+        };
+
+        const cleanup = () => {
+          if (cardEl) cardEl.classList.remove('sync-card-active');
+          if (imgEl) imgEl.classList.remove('sync-img-active');
+          if (wordEl) wordEl.classList.remove('sync-word-active');
+          if (eqEl) eqEl.classList.add('opacity-0');
+        };
+
+        engUtter.onend = () => {
+          cleanup();
+          if (onFinish) onFinish();
+        };
+
+        engUtter.onerror = () => {
+          cleanup();
+          if (onFinish) onFinish();
+        };
+
+        window.speechSynthesis.speak(engUtter);
+      }
+    };
+
+    function renderPosterCards() {
+      const container = document.getElementById('posterCardsGrid');
+      container.innerHTML = '';
+
+      VOCAB_DATA.forEach(item => {
+        const card = document.createElement('div');
+        card.id = `posterCard-${item.id}`;
+        card.className = `poster-card ${item.borderClass} rounded-[24px] p-3 sm:p-4 shadow-sm flex flex-col justify-between`;
+        card.onclick = () => handleCardInteraction(item.id);
+
+        card.innerHTML = `
+          <!-- Header of Card -->
+          <div class="flex items-center justify-between mb-2">
+            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-sm" style="background-color: ${item.color}">
+              ${item.id}
+            </div>
+            <div class="text-center flex-1 px-1">
+              <h3 id="wordText-${item.id}" class="font-english text-xl sm:text-2xl font-extrabold tracking-tight leading-tight" style="color: ${item.color}">
+                ${item.word}
+              </h3>
+              <span id="arabicText-${item.id}" class="text-sm sm:text-base font-bold text-slate-700 block -mt-0.5">
+                ${item.ar}
+              </span>
+            </div>
+            <div id="eqWave-${item.id}" class="eq-wave-box opacity-0 transition-opacity">
+              <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+            </div>
+          </div>
+
+          <!-- Vector Illustration Container -->
+          <div class="my-2 flex items-center justify-center h-28 sm:h-32">
+            <div id="imgContainer-${item.id}" class="w-28 h-28 sm:w-32 sm:h-32 transition-all duration-300 flex items-center justify-center">
+              ${SVG_ASSETS[item.id] || ''}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* Card Interaction in Poster Mode */
+    function handleCardInteraction(id) {
+      const item = VOCAB_DATA.find(x => x.id === id);
+      if (!item) return;
+      sfx.playPop();
+      showToast(item.word, `${item.word} • ${item.ar}`, "🔊");
+      speechEngine.speakCard(item);
+    }
+
+    let isAutoplaying = false;
+    function playAllCardsSequentially() {
+      if (isAutoplaying) return;
+      isAutoplaying = true;
+      const btn = document.getElementById('playAllBtn');
+      btn.disabled = true;
+      btn.classList.add('opacity-60');
+      showToast("Autoplay Started", "تشغيل البطاقات الـ 16 بالتسلسل من 1 إلى 16...", "▶️");
+
+      let idx = 0;
+      function next() {
+        if (idx >= VOCAB_DATA.length) {
+          isAutoplaying = false;
+          btn.disabled = false;
+          btn.classList.remove('opacity-60');
+          showToast("Well Done!", "تم استعراض كافة المفردات الـ 16 بنجاح! 🌟", "🎉");
+          fireConfetti(0.7);
+          return;
+        }
+        const current = VOCAB_DATA[idx];
+        const cardEl = document.getElementById(`posterCard-${current.id}`);
+        if (cardEl) cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        speechEngine.speakCard(current, () => {
+          idx++;
+          setTimeout(next, 400);
+        });
+      }
+      next();
+    }
+
+    /* Toggle Voice Speed */
+    function toggleVoiceSpeed() {
+      if (speechEngine.rate >= 0.9) {
+        speechEngine.rate = 0.75;
+        document.getElementById('speedLabel').textContent = "السرعة: بطيئة";
+        showToast("Voice Speed", "تم تقليل سرعة النطق لتسهيل الاستماع 🐢", "⚡");
+      } else {
+        speechEngine.rate = 0.92;
+        document.getElementById('speedLabel').textContent = "السرعة: عادية";
+        showToast("Voice Speed", "تم ضبط سرعة النطق على المستوى الطبيعي 🐇", "⚡");
+      }
+    }
+
+    /* Tab Switcher */
+    function switchTab(tabId) {
+      ['poster', 'quiz', 'spelling'].forEach(t => {
+        const content = document.getElementById(`tabContent-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tabId) {
+          content.classList.remove('hidden');
+          btn.classList.add('bg-indigo-600', 'text-white');
+          btn.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        } else {
+          content.classList.add('hidden');
+          btn.classList.remove('bg-indigo-600', 'text-white');
+          btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+        }
+      });
+
+      if (tabId === 'quiz') startNewQuizRound();
+      if (tabId === 'spelling') renderSpellingQuestion();
+    }
+
+    let currentQuizTarget = null;
+    let quizScore = 0;
+
+    function startNewQuizRound() {
+      currentQuizTarget = VOCAB_DATA[Math.floor(Math.random() * VOCAB_DATA.length)];
+      // Pick 3 distractors
+      const distractors = VOCAB_DATA.filter(x => x.id !== currentQuizTarget.id)
+                                    .sort(() => 0.5 - Math.random())
+                                    .slice(0, 3);
+      const options = [currentQuizTarget, ...distractors].sort(() => 0.5 - Math.random());
+
+      const grid = document.getElementById('quizOptionsGrid');
+      grid.innerHTML = '';
+
+      options.forEach(opt => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = `p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-indigo-400 cursor-pointer shadow-sm hover:shadow-md transition flex flex-col items-center justify-center text-center transform hover:-translate-y-1`;
+        cardDiv.onclick = () => checkQuizChoice(opt, cardDiv);
+
+        cardDiv.innerHTML = `
+          <div class="w-24 h-24 mb-2 flex items-center justify-center">${SVG_ASSETS[opt.id] || ''}</div>
+          <span class="font-english font-black text-lg text-slate-800">${opt.word}</span>
+          <span class="text-xs font-bold text-slate-500">${opt.ar}</span>
+        `;
+        grid.appendChild(cardDiv);
+      });
+
+      setTimeout(playQuizPromptAudio, 300);
+    }
+
+    function playQuizPromptAudio() {
+      if (!currentQuizTarget) return;
+      sfx.playPop();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(currentQuizTarget.word);
+        u.lang = 'en-GB';
+        u.rate = speechEngine.rate;
+        const voice = speechEngine.getBritishFemaleVoice();
+        if (voice) u.voice = voice;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function checkQuizChoice(selected, cardElement) {
+      if (selected.id === currentQuizTarget.id) {
+        sfx.playSuccess();
+        fireConfetti(0.5);
+        quizScore += 10;
+        document.getElementById('quizScore').textContent = quizScore;
+        cardElement.classList.add('ring-4', 'ring-emerald-400', 'bg-emerald-50');
+        showToast("إجابة صحيحة! 🌟", `ممتاز! إنها ${selected.word} (${selected.ar})`, "🎉");
+        setTimeout(startNewQuizRound, 1200);
+      } else {
+        sfx.playWrong();
+        cardElement.classList.add('ring-4', 'ring-rose-400', 'bg-rose-50');
+        showToast("حاول مجدداً", "استمع جيداً للكلمة وحاول اختيار الصورة المطابقة", "❌");
+        setTimeout(() => {
+          cardElement.classList.remove('ring-4', 'ring-rose-400', 'bg-rose-50');
+          playQuizPromptAudio();
+        }, 700);
+      }
+    }
+
+    let spellingIndex = 0;
+    function renderSpellingQuestion() {
+      const current = VOCAB_DATA[spellingIndex % VOCAB_DATA.length];
+      document.getElementById('spellingStep').textContent = (spellingIndex % VOCAB_DATA.length) + 1;
+
+      const imgWrap = document.getElementById('spellingImgWrap');
+      imgWrap.innerHTML = SVG_ASSETS[current.id] || '';
+
+      document.getElementById('spellingWordDisplay').textContent = current.missing;
+      document.getElementById('spellingArMeaning').textContent = current.ar;
+
+      // Letter choices: 1 correct + 3 random alphabet letters
+      const alphabet = "abcdefghijklmnopqrstuvwxyz";
+      const correctL = current.letter.toLowerCase();
+      const fakeLetters = alphabet.split('')
+                                  .filter(l => l !== correctL)
+                                  .sort(() => 0.5 - Math.random())
+                                  .slice(0, 3);
+      const letterChoices = [correctL, ...fakeLetters].sort(() => 0.5 - Math.random());
+
+      const keysDiv = document.getElementById('spellingKeyChoices');
+      keysDiv.innerHTML = '';
+      letterChoices.forEach(l => {
+        const btn = document.createElement('button');
+        btn.className = "w-14 h-14 bg-white hover:bg-indigo-50 border-2 border-slate-300 hover:border-indigo-500 rounded-2xl font-english font-black text-2xl text-slate-800 shadow-sm active:scale-95 transition";
+        btn.textContent = l;
+        btn.onclick = () => checkSpellingChoice(l, current);
+        keysDiv.appendChild(btn);
+      });
+    }
+
+    function checkSpellingChoice(chosenLetter, item) {
+      if (chosenLetter === item.letter.toLowerCase()) {
+        sfx.playSuccess();
+        fireConfetti(0.4);
+        document.getElementById('spellingWordDisplay').textContent = item.word;
+        if ('speechSynthesis' in window) {
+          const u = new SpeechSynthesisUtterance(item.word);
+          u.lang = 'en-GB';
+          const v = speechEngine.getBritishFemaleVoice();
+          if (v) u.voice = v;
+          window.speechSynthesis.speak(u);
+        }
+        showToast("رائع!", `الحرف الصحيح هو (${item.letter}) ليكتمل اسم ${item.word}`, "🌟");
+        setTimeout(() => {
+          spellingIndex++;
+          renderSpellingQuestion();
+        }, 1100);
+      } else {
+        sfx.playWrong();
+        showToast("حاول مجدداً", "الحرف المختار غير صحيح، انظر جيداً إلى الكلمة", "❌");
+      }
+    }
+
+    function showToast(title, message, icon = "✨") {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').textContent = title;
+      document.getElementById('toastMsg').textContent = message;
+      document.getElementById('toastIcon').textContent = icon;
+
+      toast.classList.remove('translate-y-28', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toast._timeout);
+      toast._timeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-28', 'opacity-0');
+      }, 2300);
+    }
+
+    function fireConfetti(power = 0.5) {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: Math.floor(60 * power),
+          spread: 70,
+          origin: { y: 0.7 }
+        });
+      }
+    }
+
+    /* Bootloader on Window Load */
+    window.onload = function() {
+      speechEngine.init();
+      renderPosterCards();
+      setTimeout(() => {
+        showToast("Welcome!", "انقر على أي بطاقة لسماع النطق الإنجليزي البريطاني مع تزامن الصورة الفوري 🎙️", "🇬🇧");
+      }, 600);
+    };
+  </script>
+</body>
+</html>
